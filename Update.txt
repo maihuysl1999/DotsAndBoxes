@@ -1,0 +1,7 @@
+Những thay đổi sau buổi bảo vệ project: 
++ Chia lại đối tượng theo: edges, box, board
++ Chỉnh sửa lại thuật toán trong chế độ chơi với máy.
+Phần trăm đóng góp của các thành viên: 
++ Nguyễn Long Nhật: 30%
++ Mai Quang Huy: 35%
++ Lê Vũ Lâm: 35%
