@@ -54,32 +54,69 @@ public class Board implements Cloneable {
 		redScore = blueScore = 0;
 	}
 
+	public void setRedScore(int redScore) {
+		this.redScore = redScore;
+	}
+
+	public void setBlueScore(int blueScore) {
+		this.blueScore = blueScore;
+	}
+
 	public Board clone() {
-		Board cloned = new Board(n);
+		Board cloned = new Board(this.n);
+		cloned.clear();
+
+		for (Edge hedge : hEdges) {
+			cloned.hEdges.add(new Edge(hedge));
+
+		}
+
+		for (Edge vedge : vEdges) {
+			cloned.vEdges.add(new Edge(vedge));
+		}
+
+		int count = 0;
+
+		for (int i = 0; i < (n - 1) * (n - 1); i++) {
+			cloned.box.add(new Box());
+		}
 
 		for (int i = 0; i < (n - 1); i++) {
-			Edge h = new Edge();
-			h = hEdges.get(i);
-			cloned.hEdges.add(h);
+			for (int j = 0; j < n; j++) {
+				count++;
+				if (j == 0) {
+					cloned.box.get(i).sethTEdge(cloned.hEdges.get(count - 1));
+				} else if (j < n - 1) {
+					cloned.box.get(i + (j - 1) * (n - 1)).sethDEdge(cloned.hEdges.get(count - 1));
+					cloned.box.get(i + j * (n - 1)).sethTEdge(cloned.hEdges.get(count - 1));
+				} else {
+					cloned.box.get(i + (j - 1) * (n - 1)).sethDEdge(cloned.hEdges.get(count - 1));
+				}
+
+			}
 		}
 
+		count = 0;
 		for (int i = 0; i < n; i++) {
-			Edge v = new Edge();
-			v = vEdges.get(i);
-			cloned.vEdges.add(v);
-		}
-		for (Box box3 : box) {
-			Box b = new Box();
-			b = box3;
-			cloned.box.add(b);
+			for (int j = 0; j < (n - 1); j++) {
+				count++;
+				if (i == 0)
+					cloned.box.get(j * (n - 1)).setvLEdge(cloned.vEdges.get(count - 1));
+				else if (i < (n - 1)) {
+					cloned.box.get(i - 1 + j * (n - 1)).setvREdge(cloned.vEdges.get(count - 1));
+					cloned.box.get(i + j * (n - 1)).setvLEdge(cloned.vEdges.get(count - 1));
+				} else {
+					cloned.box.get(i - 1 + j * (n - 1)).setvREdge(cloned.vEdges.get(count - 1));
+				}
+			}
 		}
 
-		cloned.redScore = redScore;
-		cloned.blueScore = blueScore;
+		cloned.setRedScore(this.redScore);
+		cloned.setBlueScore(this.blueScore);
 
 		return cloned;
 	}
-	
+
 	public int getSize() {
 		return n;
 	}
@@ -117,49 +154,52 @@ public class Board implements Cloneable {
 		return ret;
 	}
 
-
 	public ArrayList<Point> setHEdge(int x, int y, int color) {
-		int numb = x + y * (n - 1);
-		hEdges.get(x * n + y).setColorOfEdge(ColorTeam.BLACK);
 		ArrayList<Point> ret = new ArrayList<Point>();
-		if (y < (n - 1) && box.get(numb).checkBox() == true) {
-			box.get(numb).setTrangthai(color);
-			ret.add(new Point(x, y));
-			if (color == ColorTeam.RED)
-				redScore++;
-			else
-				blueScore++;
-		}
-		if (y > 0 && box.get(numb - n + 1).checkBox() == true) {
-			box.get(numb - n + 1).setTrangthai(color);
-			ret.add(new Point(x, y - 1));
-			if (color == ColorTeam.RED)
-				redScore++;
-			else
-				blueScore++;
+		int index = 0;
+		for (Box b : box) {
+			if (b.sethEdge(x, y, color) == 2) {
+				index = box.indexOf(b);
+				if (index == x + y * (n - 1)) {
+					ret.add(new Point(x, y));
+					if (color == ColorTeam.RED)
+						redScore++;
+					else
+						blueScore++;
+				} else {
+					ret.add(new Point(x, y - 1));
+					if (color == ColorTeam.RED)
+						redScore++;
+					else
+						blueScore++;
+				}
+
+			}
 		}
 		return ret;
 	}
 
 	public ArrayList<Point> setVEdge(int x, int y, int color) {
-		int numb = x + y * (n - 1);
-		vEdges.get(x * (n-1) + y).setColorOfEdge(ColorTeam.BLACK);
 		ArrayList<Point> ret = new ArrayList<Point>();
-		if (x < (n - 1) &&  box.get(numb).checkBox() == true) {
-			box.get(numb).setTrangthai(color);
-			ret.add(new Point(x, y));
-			if (color == ColorTeam.RED)
-				redScore++;
-			else
-				blueScore++;
-		}
-		if (x > 0 &&  box.get(numb -1 ).checkBox() == true) {
-			box.get(numb- 1).setTrangthai(color);
-			ret.add(new Point(x - 1, y));
-			if (color == ColorTeam.RED)
-				redScore++;
-			else
-				blueScore++;
+		int index = 0;
+		for (Box b : box) {
+			if (b.setvEdge(x, y, color) == 2) {
+				index = box.indexOf(b);
+				if (index == x + y * (n - 1)) {
+					ret.add(new Point(x, y));
+					if (color == ColorTeam.RED)
+						redScore++;
+					else
+						blueScore++;
+				} else {
+					ret.add(new Point(x - 1, y));
+					if (color == ColorTeam.RED)
+						redScore++;
+					else
+						blueScore++;
+				}
+
+			}
 		}
 		return ret;
 	}
@@ -188,13 +228,13 @@ public class Board implements Cloneable {
 
 	public int getBoxCount(int nSides) {
 		int count = 0;
-		for (Box box: box) {
+		for (Box box : this.box) {
 			if (box.countEdgeBlack() == nSides)
 				count++;
 		}
 		return count;
 	}
-	
+
 	public void clear() {
 		box.clear();
 		hEdges.clear();

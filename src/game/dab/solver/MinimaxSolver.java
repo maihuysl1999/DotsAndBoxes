@@ -1,4 +1,5 @@
 package game.dab.solver;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
@@ -19,7 +20,9 @@ public class MinimaxSolver extends GameSolver {
 		int currentColor, currentScore;
 		long oldTime = System.nanoTime();
 		long timeOut = 980000000;
-		
+		/*
+		 * long r=board.getAvailableMoves().size(); long size=1 + r, lastSize=r ; r--;
+		 */
 
 		TreeNode rootNode = new TreeNode(board, color, null, null), levelNode = null;
 		queue.add(rootNode);
@@ -27,8 +30,9 @@ public class MinimaxSolver extends GameSolver {
 		referenceColor = color;
 
 		do {
-			if ((System.nanoTime() - oldTime) > timeOut)
+			if ((System.nanoTime() - oldTime) > timeOut) {
 				break;
+			}
 			TreeNode currentNode = queue.remove();
 			if (currentNode != levelNode) {
 				stack.add(currentNode);
@@ -49,6 +53,13 @@ public class MinimaxSolver extends GameSolver {
 				}
 
 			} else {
+				/*
+				 * size += lastSize*r ;
+				 * 
+				 * if( size>=100000L || r==0 ) break;
+				 * 
+				 * lastSize *= r ; r--;
+				 */
 				queue.add(levelNode);
 			}
 		} while (queue.size() != 0);
@@ -80,6 +91,8 @@ public class MinimaxSolver extends GameSolver {
 			}
 
 		} while (stack.size() != 1);
+		// System.out.println(rootNode.getEdge().getX());
+		// System.out.println(rootNode.getEdge().getY());
 		return rootNode.getEdge();
 	}
 
